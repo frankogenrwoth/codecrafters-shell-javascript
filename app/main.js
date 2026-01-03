@@ -23,7 +23,6 @@ const cleanArgs = (args) => {
   while (i < argString.length) {
     const char = argString[i];
 
-    // Space separates arguments (only when not inside quotes)
     if (char === ' ') {
       if (current !== '') {
         result.push(current);
@@ -33,22 +32,19 @@ const cleanArgs = (args) => {
       continue;
     }
 
-    // Single quoted string - everything literal until closing quote
     if (char === "'") {
       i++;
       while (i < argString.length && argString[i] !== "'") {
         current += argString[i];
         i++;
       }
-      i++; // skip closing quote
+      i++;
     }
-    // Double quoted string - handle escape sequences
     else if (char === '"') {
       i++;
       while (i < argString.length && argString[i] !== '"') {
         if (argString[i] === '\\' && i + 1 < argString.length) {
           const next = argString[i + 1];
-          // Only these characters are escaped inside double quotes
           if (next === '"' || next === '\\' || next === '$' || next === '`' || next === '\n') {
             current += next;
             i += 2;
@@ -58,9 +54,8 @@ const cleanArgs = (args) => {
         current += argString[i];
         i++;
       }
-      i++; // skip closing quote
+      i++;
     }
-    // Backslash escape outside quotes
     else if (char === '\\') {
       if (i + 1 < argString.length) {
         current += argString[i + 1];
@@ -69,7 +64,7 @@ const cleanArgs = (args) => {
         i++;
       }
     }
-    // Regular character
+
     else {
       current += char;
       i++;
