@@ -16,8 +16,8 @@ const path = require("path");
 const { spawn } = require("child_process");
 
 const findExecutable = (command) => {
-  const extensions = [".exe", ".cmd", ".bat", ".bash", ".sh", ".zsh", ""];
   const separator = process.platform === "win32" ? ";" : ":";
+  const extensions = process.platform === "win32" ? [".exe", ".cmd", ".bat"] : [""];
   const pathDirs = process.env.PATH.split(separator).filter((dir) => dir);
   for (const dir of pathDirs) {
     for (const ext of extensions) {
@@ -48,7 +48,6 @@ function executeExternalCommand(command, args) {
 
     const child = spawn(executablePath, args, {
       stdio: 'inherit',
-      shell: false,
       argv0: command,
     });
 

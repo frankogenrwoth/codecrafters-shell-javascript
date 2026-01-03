@@ -24,7 +24,11 @@ async function executeCommand(command, args) {
       break;
     default:
       if (command) {
-        await executeExternalCommand(command, args);
+        let n = await executeExternalCommand(command, args);
+        
+        if (n === 127) {
+          console.log("command not found");
+        }
       } else {
         console.log("command not found");
       }
