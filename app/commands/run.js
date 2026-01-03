@@ -13,14 +13,12 @@
 const { execFile } = require("child_process");
 const fs = require("fs");
 const path = require("path");
+const { spawn } = require("child_process");
 
-function executeExternalCommand(command, args) {
+const findExecutable = (command) => {
   const extensions = [".exe", ".cmd", ".bat", ".bash", ".sh", ".zsh", ""];
-
   const separator = process.platform === "win32" ? ";" : ":";
-
   const pathDirs = process.env.PATH.split(separator).filter((dir) => dir);
-
   for (const dir of pathDirs) {
     for (const ext of extensions) {
       const fullPath = path.join(dir, command);
@@ -28,22 +26,42 @@ function executeExternalCommand(command, args) {
       if (fs.existsSync(fullPathWithExt)) {
         try {
           fs.accessSync(fullPathWithExt, fs.constants.X_OK);
-          execFile(fullPathWithExt, args, (error, stdout, stderr) => {
-            if (error) {
-              console.error(`Error executing ${command}: ${error.message}`);
-              return;
-            }
-            if (stdout) process.stdout.write(stdout);
-            if (stderr) process.stderr.write(stderr);
-          });
-          return;
+          return fullPathWithExt;
         } catch (err) {
-          // File exists but is not executable, continue to next directory
           continue;
         }
       }
     }
   }
-  console.log(`${command}: command not found`);
+  return null;
+};
+
+
+function executeExternalCommand(command, args) {
+  return new Promise((resolve) => {
+    const executablePath = findExecutable(command);
+
+    if (!executablePath) {
+      resolve(127);
+      return;
+    }
+
+    const child = spawn(executablePath, args, {
+      stdio: 'inherit',
+      shell: true,
+      argv0: command,
+    });
+
+    child.on('error', (err) => {
+      console.error(`Error executing ${command}: ${err.message}`);
+      resolve(1);
+    });
+
+
+    child.on('close', (code) => {
+      resolve(code || 0);
+    });
+  });
 }
+
 module.exports = { executeExternalCommand };

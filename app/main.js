@@ -11,7 +11,7 @@ const rl = readline.createInterface({
 
 const builtins = ["echo", "type", "exit"];
 
-function executeCommand(command, args) {
+async function executeCommand(command, args) {
   switch (command) {
     case "echo":
       executeEcho(args);
@@ -24,24 +24,25 @@ function executeCommand(command, args) {
       break;
     default:
       if (command) {
-        executeExternalCommand(command, args);
+        await executeExternalCommand(command, args);
       } else {
-        console.log("");
+        console.log("command not found");
       }
   }
 }
 
 
 function inputCommand() {
-  rl.question("$ ", (command) => {
+  rl.question("$ ", async (command) => {
     if (command === "exit") {
       rl.close();
       return;
     }
     const args = command.split(" ");
     const cmd = args[0];
-    executeCommand(cmd, args.slice(1));
+    await executeCommand(cmd, args.slice(1));
 
+    // Prompt for the next command after executing the current one
     inputCommand();
   });
 }
