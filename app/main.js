@@ -7,6 +7,10 @@ const rl = readline.createInterface({
 
 function inputCommand() {
   rl.question("$ ", (command) => {
+    if (command === "exit") {
+      rl.close();
+      return;
+    }
     console.log(`${command}: command not found`);
     inputCommand();
   });
