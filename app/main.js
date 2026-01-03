@@ -3,6 +3,7 @@ const { executeType } = require("./commands/type");
 const { executeEcho } = require("./commands/echo");
 const { executeExternalCommand } = require("./commands/run");
 const { executePwd } = require("./commands/pwd");
+const { executeCd } = require("./commands/cd");
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -10,7 +11,7 @@ const rl = readline.createInterface({
 });
 
 
-const builtins = ["echo", "type", "exit", "pwd"];
+const builtins = ["echo", "type", "exit", "pwd", "cd"];
 
 async function executeCommand(command, args) {
   switch (command) {
@@ -25,6 +26,9 @@ async function executeCommand(command, args) {
       break;
     case "pwd":
       await executePwd();
+      break;
+    case "cd":
+      await executeCd(args);
       break;
     default:
       if (command) {
