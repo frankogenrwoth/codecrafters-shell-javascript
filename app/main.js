@@ -1,6 +1,7 @@
 const readline = require("readline");
 const { executeType } = require("./commands/type");
 const { executeEcho } = require("./commands/echo");
+const { executeExternalCommand } = require("./commands/run");
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -22,7 +23,11 @@ function executeCommand(command, args) {
       executeType(args, builtins);
       break;
     default:
-      console.log(`${command}: command not found`);
+      if (command) {
+        executeExternalCommand(command, args);
+      } else {
+        console.log("");
+      }
   }
 }
 
