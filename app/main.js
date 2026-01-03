@@ -16,28 +16,71 @@ const builtins = ["echo", "type", "exit", "pwd", "cd"];
 
 const cleanArgs = (args) => {
   const argString = args.join(" ");
+  const result = [];
+  let current = '';
+  let i = 0;
 
-  // Shell-accurate regex: preserves quoted content literally
-  // Captures: single quotes | double quotes | unquoted words
-  const matches = argString.match(/(?:'([^']*)')|(?:"([^"]*)")|(\\["']?[^\s'"\\]|\\s+)|(\S+)/g) || [];
+  while (i < argString.length) {
+    const char = argString[i];
 
-  return matches.map(match => {
-    if (match.startsWith("'") && match.endsWith("'")) {
-      return match.slice(1, -1);
+    // Space separates arguments (only when not inside quotes)
+    if (char === ' ') {
+      if (current !== '') {
+        result.push(current);
+        current = '';
+      }
+      i++;
+      continue;
     }
 
-    if (match.startsWith('"') && match.endsWith('"')) {
-      let content = match.slice(1, -1);
-      content = content.replace(/\\"/g, '"');
-      return content;
+    // Single quoted string - everything literal until closing quote
+    if (char === "'") {
+      i++;
+      while (i < argString.length && argString[i] !== "'") {
+        current += argString[i];
+        i++;
+      }
+      i++; // skip closing quote
     }
-
-    if (match.startsWith('\\')) {
-      return match.slice(1);
+    // Double quoted string - handle escape sequences
+    else if (char === '"') {
+      i++;
+      while (i < argString.length && argString[i] !== '"') {
+        if (argString[i] === '\\' && i + 1 < argString.length) {
+          const next = argString[i + 1];
+          // Only these characters are escaped inside double quotes
+          if (next === '"' || next === '\\' || next === '$' || next === '`' || next === '\n') {
+            current += next;
+            i += 2;
+            continue;
+          }
+        }
+        current += argString[i];
+        i++;
+      }
+      i++; // skip closing quote
     }
+    // Backslash escape outside quotes
+    else if (char === '\\') {
+      if (i + 1 < argString.length) {
+        current += argString[i + 1];
+        i += 2;
+      } else {
+        i++;
+      }
+    }
+    // Regular character
+    else {
+      current += char;
+      i++;
+    }
+  }
 
-    return match;
-  }).filter(Boolean);
+  if (current !== '') {
+    result.push(current);
+  }
+
+  return result;
 };
 
 async function executeCommand(command,rawArgs) {
