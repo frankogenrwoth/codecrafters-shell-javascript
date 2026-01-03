@@ -1,5 +1,6 @@
 const readline = require("readline");
 const { executeType } = require("./commands/type");
+const { executeEcho } = require("./commands/echo");
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -12,12 +13,7 @@ const builtins = ["echo", "type", "exit"];
 function executeCommand(command, args) {
   switch (command) {
     case "echo":
-      if (args.length === 0) {
-        console.log();
-        return;
-      }
-
-      console.log(args.join(" "));
+      executeEcho(args);
       break;
     case "exit":
       rl.close();
