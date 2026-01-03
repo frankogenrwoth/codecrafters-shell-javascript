@@ -6,7 +6,8 @@ const executeEcho = (args) => {
     return;
   }
   
-  console.log(args[0]);
+  console.log(args.join(" "));
+  console.log(args.join(" ").replace(/["']/g, '').trim());
 };
 
 module.exports = { executeEcho };
