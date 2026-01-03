@@ -6,7 +6,6 @@ const executeEcho = (args) => {
     return;
   }
   
-  console.log(args.join(" "));
   console.log(args.join(" ").replace(/["']/g, '').trim());
 };
 
