@@ -5,15 +5,10 @@ const rl = readline.createInterface({
   output: process.stdout,
 });
 
+
 const knownCommands = ["echo", "type", "exit"];
 
 function executeCommand(command, args) {
-  if (!knownCommands.includes(command)) {
-    console.log(`${command}: command not found`);
-    return;
-  }
-
-
   switch (command) {
     case "echo":
       if (args.length === 0) {
@@ -28,9 +23,13 @@ function executeCommand(command, args) {
       break;
     case "type":
       if (args.length === 0) {
-        console.log(`${args[0]}: command not found`);
-      } else {
+        console.log(`invalid usage of command type`);
+        return;
+      }
+      if (knownCommands.includes(args[0])) {
         console.log(`${args[0]} is a shell builtin`);
+      } else {
+        console.log(`${args[0]}: not found`);
       }
       break;
     default:
@@ -47,11 +46,7 @@ function inputCommand() {
     }
     const args = command.split(" ");
     const cmd = args[0];
-    if (knownCommands.includes(cmd)) {
-      executeCommand(cmd, args.slice(1));
-    } else {
-      console.log(`${command}: command not found`);
-    }
+    executeCommand(cmd, args.slice(1));
 
     inputCommand();
   });
