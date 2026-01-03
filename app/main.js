@@ -11,6 +11,15 @@ function inputCommand() {
       rl.close();
       return;
     }
+    const args = command.split(" ");
+    const cmd = args[0];
+
+    if (cmd === "echo") {
+      console.log(args.slice(1).join(" "));
+      inputCommand();
+      return;
+    }
+
     console.log(`${command}: command not found`);
     inputCommand();
   });
