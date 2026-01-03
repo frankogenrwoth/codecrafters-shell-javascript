@@ -13,7 +13,38 @@ const rl = readline.createInterface({
 
 const builtins = ["echo", "type", "exit", "pwd", "cd"];
 
-async function executeCommand(command, args) {
+
+const cleanArgs = (args) => {
+  const argString = args.join(" ");
+
+  // Shell-accurate regex: preserves quoted content literally
+  // Captures: single quotes | double quotes | unquoted words
+  const matches = argString.match(/(?:'([^']*)')|(?:"([^"]*)")|(\\["']?[^\s'"\\]|\\s+)|(\S+)/g) || [];
+
+  return matches.map(match => {
+    if (match.startsWith("'") && match.endsWith("'")) {
+      return match.slice(1, -1);
+    }
+
+    if (match.startsWith('"') && match.endsWith('"')) {
+      let content = match.slice(1, -1);
+      content = content.replace(/\\"/g, '"');
+      return content;
+    }
+
+    if (match.startsWith('\\')) {
+      return match.slice(1);
+    }
+
+    return match;
+  }).filter(Boolean);
+};
+
+async function executeCommand(command,rawArgs) {
+  // handling single quotes in args
+
+  const args = cleanArgs(rawArgs);
+
   switch (command) {
     case "echo":
       executeEcho(args);

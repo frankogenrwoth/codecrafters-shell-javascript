@@ -6,7 +6,7 @@ const executeEcho = (args) => {
     return;
   }
   
-  console.log(args.join(" "));
+  console.log(args[0]);
 };
 
 module.exports = { executeEcho };
