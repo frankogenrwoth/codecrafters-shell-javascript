@@ -5,6 +5,9 @@ const rl = readline.createInterface({
     output: process.stdout,
 });
 
-rl.question("$ ", (command) => {
-    console.log(`${command}: command not found`);
-});
+while (true) {
+    rl.question("$ ", (command) => {
+        console.log(`${command}: command not found`);
+    });
+}
+
