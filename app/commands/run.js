@@ -48,7 +48,6 @@ function executeExternalCommand(command, args) {
 
     const child = spawn(executablePath, args, {
       stdio: 'inherit',
-      argv0: command,
     });
 
     child.on('error', (err) => {
