@@ -10,7 +10,7 @@ const lex = async (input) => {
       if (quote) {
         if (char === quote) {
           quote = null;
-        } else if (char === '\\' && (quote === '"' || quote === "'")) {
+        } else if (char === '\\' && quote === '"') {
           current += input[++i] || '';
         } else {
           current += char;
@@ -54,7 +54,7 @@ const lexCommand = async (input) => {
       if (quote) {
         if (input[i] === quote) {
           quote = null;
-        } else if (input[i] === '\\' && (quote === '"' || quote === "'")) {
+        } else if (input[i] === '\\' && quote === '"') {
           cmd += input[++i] || '';
         } else {
           cmd += input[i];
