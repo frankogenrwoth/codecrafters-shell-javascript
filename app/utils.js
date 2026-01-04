@@ -47,8 +47,8 @@ const lex = async (input) => {
 
 const lexCommand = async (input) => {
   return new Promise((resolve) => {
-    const cmd = "";
-    quote = null;
+    let cmd = "";
+    let quote = null;
 
     for (let i = 0; i < input.length; i++) {
       if (quote) {
