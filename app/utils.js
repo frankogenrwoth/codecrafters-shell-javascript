@@ -55,10 +55,11 @@ const lexCommand = async (input) => {
         if (input[i] === quote) {
           quote = null;
         } else if (input[i] === '\\' && (quote === '"' || quote === "'")) {
-          i++; // skip escaped character
+          cmd += input[++i] || '';
         } else {
-          continue;
+          cmd += input[i];
         }
+        continue;
       }
 
       if (input[i] === '"' || input[i] === "'") {
