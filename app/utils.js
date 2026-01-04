@@ -46,22 +46,19 @@ const lex = async (input) => {
 }
 
 const lexCommand = async (input) => {
-
-  // 'exe with "quotes"' /tmp/pig/f2
   return new Promise((resolve) => {
-    let cmd = "";
-    let quote = null;
+    const cmd = "";
+    quote = null;
 
     for (let i = 0; i < input.length; i++) {
       if (quote) {
         if (input[i] === quote) {
           quote = null;
         } else if (input[i] === '\\' && (quote === '"' || quote === "'")) {
-          cmd += input[++i] || ''; // add escaped character
+          i++; // skip escaped character
         } else {
-          cmd += input[i]; // add quoted content
+          continue;
         }
-        continue;
       }
 
       if (input[i] === '"' || input[i] === "'") {
