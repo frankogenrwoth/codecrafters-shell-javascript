@@ -1,4 +1,5 @@
 const readline = require("readline");
+const { lex } = require("./utils");
 const { executeType } = require("./commands/type");
 const { executeEcho } = require("./commands/echo");
 const { executeExternalCommand } = require("./commands/run");
@@ -13,76 +14,8 @@ const rl = readline.createInterface({
 
 const builtins = ["echo", "type", "exit", "pwd", "cd"];
 
-
-const cleanArgs = (args) => {
-  const argString = args.join(" ");
-  const result = [];
-  let current = '';
-  let i = 0;
-
-  while (i < argString.length) {
-    const char = argString[i];
-
-    if (char === ' ') {
-      if (current !== '') {
-        result.push(current);
-        current = '';
-      }
-      i++;
-      continue;
-    }
-
-    if (char === "'") {
-      i++;
-      while (i < argString.length && argString[i] !== "'") {
-        current += argString[i];
-        i++;
-      }
-      i++;
-    }
-    else if (char === '"') {
-      i++;
-      while (i < argString.length && argString[i] !== '"') {
-        if (argString[i] === '\\' && i + 1 < argString.length) {
-          const next = argString[i + 1];
-          if (next === '"' || next === '\\' || next === '$' || next === '`' || next === '\n') {
-            current += next;
-            i += 2;
-            continue;
-          }
-        }
-        current += argString[i];
-        i++;
-      }
-      i++;
-    }
-    else if (char === '\\') {
-      if (i + 1 < argString.length) {
-        current += argString[i + 1];
-        i += 2;
-      } else {
-        i++;
-      }
-    }
-
-    else {
-      current += char;
-      i++;
-    }
-  }
-
-  if (current !== '') {
-    result.push(current);
-  }
-
-  return result;
-};
-
-async function executeCommand(command,rawArgs) {
+async function executeCommand(command, args) {
   // handling single quotes in args
-
-  const args = cleanArgs(rawArgs);
-
   switch (command) {
     case "echo":
       executeEcho(args);
@@ -119,9 +52,10 @@ function inputCommand() {
       rl.close();
       return;
     }
-    const args = command.split(" ");
-    const cmd = args[0];
-    await executeCommand(cmd, args.slice(1));
+    const source = command.replace(/\\\n/g, "");
+    const tokens = await lex(source);
+    const cmd = tokens[0];
+    await executeCommand(cmd, tokens.slice(1));
 
     // Prompt for the next command after executing the current one
     inputCommand();
