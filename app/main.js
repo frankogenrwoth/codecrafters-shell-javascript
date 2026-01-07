@@ -52,9 +52,11 @@ function inputCommand() {
       rl.close();
       return;
     }
-    const source = command.replace(/\\\n/g, "");
+    // const source = command.replace(/\\\n/g, "");
+    const source = command;
     const tokens = await lex(source);
-    const cmd = tokens[0];
+
+    const cmd = String(tokens[0]).replace(/'/g, "\\'");
     await executeCommand(cmd, tokens.slice(1));
 
     // Prompt for the next command after executing the current one
