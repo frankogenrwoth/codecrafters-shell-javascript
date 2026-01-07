@@ -52,7 +52,7 @@ function inputCommand() {
       rl.close();
       return;
     }
-    // const source = command.replace(/\\\n/g, "");
+
     const source = command;
     const tokens = await lex(source);
 
