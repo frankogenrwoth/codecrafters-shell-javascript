@@ -56,8 +56,16 @@ function inputCommand() {
     const source = command;
     const tokens = await lex(source);
 
-    const cmd = String(tokens[0]).replace(/'/g, "\\'");
-    await executeCommand(cmd, tokens.slice(1));
+    // Filter out operator tokens and extract word values
+    const wordTokens = tokens.filter(token => token.type === 'word').map(token => token.value);
+
+    if (wordTokens.length === 0) {
+      inputCommand();
+      return;
+    }
+
+    const cmd = String(wordTokens[0]).replace(/'/g, "\\'");
+    await executeCommand(cmd, wordTokens.slice(1));
 
     // Prompt for the next command after executing the current one
     inputCommand();
