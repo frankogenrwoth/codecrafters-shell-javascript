@@ -1,10 +1,6 @@
 const readline = require("readline");
 const { lex } = require("./utils");
-const { executeType } = require("./commands/type");
-const { executeEcho } = require("./commands/echo");
-const { executeExternalCommand } = require("./commands/run");
-const { executePwd } = require("./commands/pwd");
-const { executeCd } = require("./commands/cd");
+const { executeType, executeEcho, executeExternalCommand, executePwd, executeCd } = require("./commands");
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -64,7 +60,12 @@ function inputCommand() {
       return;
     }
 
-    const cmd = String(wordTokens[0]).replace(/'/g, "\\'");
+    // Process command to strip quotes if present
+    let cmd = String(wordTokens[0]);
+    if ((cmd.startsWith('"') && cmd.endsWith('"')) || (cmd.startsWith("'") && cmd.endsWith("'"))) {
+      cmd = cmd.slice(1, -1);
+    }
+
     await executeCommand(cmd, wordTokens.slice(1));
 
     // Prompt for the next command after executing the current one

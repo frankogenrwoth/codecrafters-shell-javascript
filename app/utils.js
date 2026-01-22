@@ -200,4 +200,61 @@ const lexCommand = async (input) => {
   });
 }
 
-module.exports = { lex, lexCommand };
+/**
+ * Process a shell argument token - strips quotes and handles escape sequences
+ * @param {string} str - The raw token from the lexer
+ * @returns {string} - The processed argument value
+ */
+const processArg = (str) => {
+  let result = [];
+  let quoteChar = null;
+  let inBackslash = false;
+
+  for (let i = 0; i < str.length; i++) {
+    const char = str[i];
+
+    // Handle backslash escaping first (applies to both quoted and unquoted contexts)
+    if (inBackslash) {
+      result.push(char);  // Escaped char is literal
+      inBackslash = false;
+      continue;
+    }
+
+    if (quoteChar) {
+      // Inside quotes
+      if (char === '\\' && quoteChar === '"') {
+        // Backslash only escapes in double quotes, not in single quotes
+        inBackslash = true;
+        continue;
+      } else if (char === quoteChar) {
+        quoteChar = null;  // End quotes
+        continue;
+      } else {
+        result.push(char);  // Normal quoted char
+        continue;
+      }
+    } else {
+      // Outside quotes
+      if (char === '"' || char === "'") {
+        quoteChar = char;
+        continue;
+      }
+
+      if (char === '\\') {
+        inBackslash = true;
+        continue;
+      }
+
+      result.push(char);  // Unquoted char
+    }
+  }
+
+  // Handle trailing backslash outside quotes
+  if (inBackslash) {
+    result.push('\\');
+  }
+
+  return result.join('');
+};
+
+module.exports = { lex, lexCommand, processArg };

@@ -10,10 +10,10 @@
   * Execute it with three arguments: custom_exe (the program name), arg1, and arg2
   *
 */
-const { execFile } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 const { spawn } = require("child_process");
+const { processArg } = require("../utils");
 
 const findExecutable = (command) => {
   const separator = process.platform === "win32" ? ";" : ":";
@@ -46,7 +46,10 @@ function executeExternalCommand(command, args) {
       return;
     }
 
-    const child = spawn(executablePath, args, {
+    // Process arguments to strip quotes and handle escapes
+    const processedArgs = args.map((arg) => processArg(arg));
+
+    const child = spawn(executablePath, processedArgs, {
       stdio: 'inherit',
       argv0: command,
     });
