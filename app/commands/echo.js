@@ -9,7 +9,7 @@ const executeEcho = (args) => {
 
   const processed = args.map((arg) => processArg(arg));
 
-  console.log(processed.join(" "));
+  console.log(processed.join("a "));
 };
 
 module.exports = { executeEcho };
