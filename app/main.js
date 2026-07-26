@@ -18,9 +18,11 @@ const completerFn = (prefix) => {
   let completions = builtins.concat([...files, ...builtins]);
   completions.sort((a, b) => a.length - b.length);
 
-  const hits = completions.filter((c) => c.startsWith(prefix));
+  const hits = completions
+    .filter((c) => c.startsWith(prefix))
+    .map((x) => x + " ");
 
-  return [hits.length ? hits.map((x) => x + " ") : completions, prefix];
+  return [hits.length ? hits : completions, prefix];
 };
 
 const rl = readline.createInterface({
