@@ -1,14 +1,33 @@
 const readline = require("readline");
 const { lex } = require("./utils");
-const { executeType, executeEcho, executeExternalCommand, executePwd, executeCd } = require("./commands");
+const {
+  executeType,
+  executeEcho,
+  executeExternalCommand,
+  executePwd,
+  executeCd,
+} = require("./commands");
+
+const fs = require("node:fs");
+
+const builtins = ["echo", "type", "exit", "pwd", "cd"];
+
+const completerFn = (prefix) => {
+  const files = fs.readdirSync(process.cwd());
+
+  let completions = builtins.concat([...files, ...builtins]);
+  completions.sort((a, b) => a.length - b.length);
+
+  const hits = completions.filter((c) => c.startsWith(prefix));
+
+  return [hits.length ? hits.map((x) => x + " ") : completions, prefix];
+};
 
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
+  completer: completerFn,
 });
-
-
-const builtins = ["echo", "type", "exit", "pwd", "cd"];
 
 async function executeCommand(command, args) {
   // handling single quotes in args
@@ -41,7 +60,6 @@ async function executeCommand(command, args) {
   }
 }
 
-
 function inputCommand() {
   rl.question("$ ", async (command) => {
     if (command === "exit") {
@@ -53,7 +71,9 @@ function inputCommand() {
     const tokens = await lex(source);
 
     // Filter out operator tokens and extract word values
-    const wordTokens = tokens.filter(token => token.type === 'word').map(token => token.value);
+    const wordTokens = tokens
+      .filter((token) => token.type === "word")
+      .map((token) => token.value);
 
     if (wordTokens.length === 0) {
       inputCommand();
@@ -62,7 +82,10 @@ function inputCommand() {
 
     // Process command to strip quotes if present
     let cmd = String(wordTokens[0]);
-    if ((cmd.startsWith('"') && cmd.endsWith('"')) || (cmd.startsWith("'") && cmd.endsWith("'"))) {
+    if (
+      (cmd.startsWith('"') && cmd.endsWith('"')) ||
+      (cmd.startsWith("'") && cmd.endsWith("'"))
+    ) {
       cmd = cmd.slice(1, -1);
     }
 
@@ -74,4 +97,3 @@ function inputCommand() {
 }
 
 inputCommand();
-
