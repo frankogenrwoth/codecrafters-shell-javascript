@@ -21,14 +21,13 @@ const completerFn = (prefix) => {
 
   completions.sort((a, b) => a.length - b.length);
 
-  if (spacePattern.test(prefix)) {
+if (spacePattern.test(prefix)) {
     prefix = prefix.split(/\s+/).pop();
   }
 
   const hits = completions
     .filter((c) => c.startsWith(prefix))
     .map((x) => x + " ");
-
   return [hits.length ? hits : completions, prefix];
 };
 
