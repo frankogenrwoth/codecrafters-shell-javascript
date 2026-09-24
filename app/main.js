@@ -12,15 +12,24 @@ const fs = require("node:fs");
 
 const builtins = ["echo", "type", "exit", "pwd", "cd"];
 
+const spacePattern = /\s+/;
+
 const completerFn = (prefix) => {
   const files = fs.readdirSync(process.cwd());
 
   let completions = builtins.concat([...files, ...builtins]);
+
   completions.sort((a, b) => a.length - b.length);
 
-  const hits = completions.filter((c) => c.startsWith(prefix));
+  if (spacePattern.test(prefix)) {
+    prefix = prefix.split(/\s+/).pop();
+  }
 
-  return [hits.length ? hits.map((x) => x + " ") : completions, prefix];
+  const hits = completions
+    .filter((c) => c.startsWith(prefix))
+    .map((x) => x + " ");
+
+  return [hits.length ? hits : completions, prefix];
 };
 
 const rl = readline.createInterface({

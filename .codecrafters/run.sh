@@ -9,4 +9,4 @@
 # Exit early if any commands fail
 set -e
 
-exec node app/main.js "$@"
+exec node "$(cd "$(dirname "$0")" && pwd)/app/main.js" "$@"
